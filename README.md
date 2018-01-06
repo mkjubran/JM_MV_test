@@ -1,1 +1,4 @@
-# JM_MV_test
+# mvcnn
+Video Classification Using H.264 Motion Compensation Parameters
+
+.
