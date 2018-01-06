@@ -219,6 +219,7 @@ void next_macroblock(Macroblock *currMB)
   cur_stats->quant[slice_type] += currMB->qp;
   ++cur_stats->num_macroblocks[slice_type];
 
+
 // Added by Jubran to get number of bits per MB
 int yP=0; //motion data P-slice
 int yB=0; //motion data B-slice
@@ -232,6 +233,7 @@ fprintf(FStatout,"\n  %6d  | %6d | %7d |  %7d |  %7d   |  %7d   | %7d | %7d | %7
 fclose (FStatout) ;
 // end of addition by Jubran
 
+ 
 }
 
 static void set_chroma_qp(Macroblock* currMB)
@@ -392,7 +394,6 @@ void start_macroblock(Slice *currSlice, Macroblock **currMB, int mb_addr, Boolea
 
   prev_mb = FmoGetPreviousMBNr(p_Vid, mb_addr);
 
-
   if(use_bitstream_backing)
   {
     if ((!p_Inp->MbInterlace)||((mb_addr & 0x01)==0)) // KS: MB AFF -> store stream positions for 1st MB only
@@ -425,7 +426,6 @@ void start_macroblock(Slice *currSlice, Macroblock **currMB, int mb_addr, Boolea
   // Initialize delta qp change from last macroblock. Feature may be used for future rate control
   // Rate control
   (*currMB)->qpsp = (short) p_Vid->qpsp;
-
 
   if (prev_mb > -1 && (p_Vid->mb_data[prev_mb].slice_nr == currSlice->slice_nr))
   {
@@ -544,7 +544,6 @@ void end_macroblock(Macroblock *currMB,         //!< Current Macroblock
   int use_bitstream_backing = (p_Inp->slice_mode == FIXED_RATE || p_Inp->slice_mode == CALL_BACK);
   int skip = FALSE;
   int new_slice = 0;
-
 
   // if previous mb in the same slice group has different slice number as the current, it's the
   // the start of new slice
@@ -723,8 +722,6 @@ void end_macroblock(Macroblock *currMB,         //!< Current Macroblock
         skip = FALSE;
       }
     }
-
-
 
     // Skip MBs at the end of this slice for Slice Mode 0 or 1
     if(*end_of_slice == TRUE && p_Vid->cod_counter && !use_bitstream_backing)
@@ -2131,7 +2128,6 @@ int write_b_slice_MB_layer (Macroblock *currMB, int rdopt, int *coeff_rate)
     }
   }
   // VLC not intra
-
   else if (currMB->mb_type != 0 || ((currMB->cbp != 0 || currSlice->cmp_cbp[1] != 0 || currSlice->cmp_cbp[2]!=0 )))
   {
     //===== Run Length Coding: Non-Skipped macroblock =====
@@ -2188,7 +2184,6 @@ int write_b_slice_MB_layer (Macroblock *currMB, int rdopt, int *coeff_rate)
 
     no_bits  += se.len;
   }
-
   else
   {
     //Run Length Coding: Skipped macroblock
@@ -2417,11 +2412,9 @@ int write_p_slice_MB_layer (Macroblock *currMB, int rdopt, int *coeff_rate)
       no_bits         += se.len;
     }
   }
-  
   // VLC not intra
   else if (currMB->mb_type != 0)
   {
-
     //===== Run Length Coding: Non-Skipped macroblock =====
     se.value1 = p_Vid->cod_counter;
     se.value2 = 0;
@@ -2475,12 +2468,9 @@ int write_p_slice_MB_layer (Macroblock *currMB, int rdopt, int *coeff_rate)
     currSlice->writeMB_typeInfo(currMB, &se, dataPart);
 
     no_bits         += se.len;
- 
 }
-  
 else
   {
-
     //Run Length Coding: Skipped macroblock
     ++(p_Vid->cod_counter);
 
@@ -2502,9 +2492,7 @@ else
 
       // Reset cod counter
       p_Vid->cod_counter = 0;
-
     }
-
   }
   mbBits->mb_mode = mbBits->mb_mode + (unsigned short) no_bits;;
 
@@ -2565,7 +2553,6 @@ else
   if (currMB->IntraChromaPredModeFlag && ((p_Vid->active_sps->chroma_format_idc != YUV400) && (p_Vid->active_sps->chroma_format_idc != YUV444)))
     {
 no_bits += write_chroma_intra_pred_mode(currMB);
-
 } 
  else if(!rdopt) //GB CHROMA !!!!!
   {
@@ -2758,7 +2745,7 @@ int write_chroma_intra_pred_mode(Macroblock* currMB)
   
 
   //===== BITS FOR CHROMA INTRA PREDICTION MODES
-/* commented by Jubran to avoid writing uv
+///* commented by Jubran to avoid writing uv
 
   se.value1 = currMB->c_ipred_mode;
   se.value2 = 0;
@@ -2766,11 +2753,12 @@ int write_chroma_intra_pred_mode(Macroblock* currMB)
 
   TRACE_SE(se.tracestring, "intra_chroma_pred_mode");
   currSlice->writeCIPredMode(currMB, &se, dataPart); // commented by Jubran
-*/
+//*/
 
 // added by Jubran
-se.len=0;
-//end of addition
+//se.len=0;
+//end 
+
   currMB->bits.mb_uv_coeff += se.len;
   rate                       += se.len;
 
@@ -2926,7 +2914,6 @@ void write_macroblock (Macroblock* currMB, int eos_bit)
     + mbBits->mb_cb_coeff
     + mbBits->mb_cr_coeff;
 
-
   if ( p_Inp->RCEnable )
     rc_update_mb_stats(currMB);  
 
@@ -3059,8 +3046,6 @@ currMB->ToWriteTexture = 1;
       {
         curr_mvd = mvd[k];
 
-
-        
        //--- store (oversampled) mvd ---
         for (l = j; l < j + step_v; ++l)
         {
@@ -3085,7 +3070,6 @@ dy_=mvd[1];
   fwrite(&(dx_), sizeof(int), 1, mvout) ; 		//added by jubran to save the MV of encoder for debuging
   fwrite(&(dy_), sizeof(int), 1, mvout) ; 		//added by jubran to save the MV of encoder for debuging
   
-
           }
         } 
 
@@ -3241,7 +3225,6 @@ int write_p_slice_motion_info_to_NAL (Macroblock* currMB)
         {
           no_bits  += writeMotionVector8x8 (currMB, i0, j0, i0 + step_h0, j0 + step_v0, motion[currMB->block_y + j0][currMB->block_x + i0].ref_idx[LIST_0],
             LIST_0, currMB->b8x8[k].mode, currMB->b8x8[k].bipred);
-
         }
       }
     }
@@ -4144,9 +4127,6 @@ int writeCoeff4x4_CAVLC_normal (Macroblock* currMB, int block_type, int b8, int 
 
     pLevel = currSlice->cofAC[b8][b4][0];
     pRun   = currSlice->cofAC[b8][b4][1];
-
-
-
 #if TRACE
     sprintf(type, "%s", "Luma");
 #endif
@@ -4234,15 +4214,14 @@ int writeCoeff4x4_CAVLC_normal (Macroblock* currMB, int block_type, int b8, int 
   }
 
 
-//* values modified by Jubran to replace Y, Cb, Cr coeff by Zerp CAVLC code
+/* values modified by Jubran to replace Y, Cb, Cr coeff by Zerp CAVLC code
 level=0;
 run=0;
 numcoeff=0;
 numones=0;
 totzeros=0;
 numtrailingones=0;
-//printf("\n\n ....MinMVtoWriteTexture = %d\n\n",p_Vid->p_Inp->MinMVtoWriteTexture); // added by jubran 
-//*/// end of modification by jubran
+*/// end of modification
 
   if (!cdc)
   {
@@ -4265,8 +4244,7 @@ numtrailingones=0;
     p_Vid->nz_coeff [currMB->mbAddrX ][subblock_x][subblock_y] = numcoeff;
 
     numcoeff_vlc = (nnz < 2) ? 0 : ((nnz < 4) ? 1 : ((nnz < 8) ? 2 : 3));
-
-numcoeff_vlc=0; //added by Jubran
+//numcoeff_vlc=0; //added by Jubran
   }
   else
   {
@@ -4280,9 +4258,10 @@ numcoeff_vlc=0; //added by Jubran
   }
 
   se.type  = dptype;
+
   se.value1 = numcoeff;
   se.value2 = numtrailingones;
-  se.len    = numcoeff_vlc; // use len to pass vlcnum
+  se.len    = numcoeff_vlc; /* use len to pass vlcnum */
 
 #if TRACE
   snprintf(se.tracestring,
@@ -4290,18 +4269,16 @@ numcoeff_vlc=0; //added by Jubran
     type, subblock_x, subblock_y, numcoeff_vlc, numcoeff, numtrailingones);
 #endif
 
-/* Commented by Jubran in order not to write Y and Cb, Cr Coeff to bitstream
+///* Commented by Jubran in order not to write Y and Cb, Cr Coeff to bitstream
   if (!cdc)
-    writeSyntaxElement_NumCoeffTrailingOnes(&se, dataPart); // Commented by Jubran in order not to write CoeffTrailingOnes
- else
-  writeSyntaxElement_NumCoeffTrailingOnesChromaDC(p_Vid, &se, dataPart); // Commented by Jubran in order not to write CoeffTrailingOnesChromaDC
-*/
-
-dataPart->bitstream->write_flag = 1; //added by Jubran as a result of comenting the lines above, must be removed if the above lines are not commented
+    writeSyntaxElement_NumCoeffTrailingOnes(&se, dataPart);
+  else
+    writeSyntaxElement_NumCoeffTrailingOnesChromaDC(p_Vid, &se, dataPart);
+//dataPart->bitstream->write_flag = 1; //added by Jubran as a result of comenting the lines above, must be removed if the above lines are not commented
 
   *mb_bits_coeff += se.len;
   no_bits                += se.len;
-  
+
   if (!numcoeff)
     return no_bits;
 
@@ -4336,9 +4313,7 @@ dataPart->bitstream->write_flag = 1; //added by Jubran as a result of comenting 
         type, subblock_x, subblock_y);
 #endif
 
-writeSyntaxElement_VLC (&se, dataPart); 
- 
-
+      writeSyntaxElement_VLC (&se, dataPart);
       *mb_bits_coeff += se.len;
       no_bits                += se.len;
 
@@ -4378,7 +4353,7 @@ writeSyntaxElement_VLC (&se, dataPart);
         writeSyntaxElement_Level_VLC1(&se, dataPart, p_Vid->active_sps->profile_idc);
       else
         writeSyntaxElement_Level_VLCN(&se, vlcnum, dataPart, p_Vid->active_sps->profile_idc);
- 
+
       // update VLC table
       if (iabs(level) > incVlc[vlcnum])
         vlcnum++;
@@ -4393,6 +4368,7 @@ writeSyntaxElement_VLC (&se, dataPart);
     // encode total zeroes
     if (numcoeff < max_coeff_num)
     {
+
       se.type  = dptype;
       se.value1 = totzeros;
 
@@ -4704,9 +4680,9 @@ int writeCoeff4x4_CAVLC_444 (Macroblock* currMB, int block_type, int b8, int b4,
   se.type  = dptype;
 
 //added by Jubran to write no coeff to bitstream
-numcoeff=0;
-numcoeff_vlc = 0;
-// end of modifications of Jubran
+//numcoeff=0;
+//numcoeff_vlc = 0;
+// end of modifications
 
   se.value1 = numcoeff;
   se.value2 = numtrailingones;
@@ -4718,14 +4694,14 @@ numcoeff_vlc = 0;
     type, subblock_x, subblock_y, numcoeff_vlc, numcoeff, numtrailingones);
 #endif
 
-/* commented by Jubran to Write no coeff to bitstream
+///* commented by Jubran to Write no coeff to bitstream
   if (!cdc)
     writeSyntaxElement_NumCoeffTrailingOnes(&se, dataPart);
   else
     writeSyntaxElement_NumCoeffTrailingOnesChromaDC(p_Vid, &se, dataPart);
-*/
+//*/
 
-dataPart->bitstream->write_flag = 1; //added by Jubran to Write no coeff to bitstream based on commenting the above stream
+//dataPart->bitstream->write_flag = 1; //added by Jubran to Write no coeff to bitstream based on commenting the above stream
 
 
   *mb_bits_coeff += se.len;
@@ -4734,7 +4710,6 @@ dataPart->bitstream->write_flag = 1; //added by Jubran to Write no coeff to bits
   if (!numcoeff)
     return no_bits;
 
- 
   if (numcoeff)
   {
     code = 0;

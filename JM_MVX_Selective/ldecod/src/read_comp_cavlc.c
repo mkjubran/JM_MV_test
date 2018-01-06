@@ -270,35 +270,35 @@ void read_coeff_4x4_CAVLC (Macroblock *currMB,
   dP = &(currSlice->partArr[partMap[dptype]]);
   currStream = dP->bitstream;  
 
-/* //Commented by Jubran to avoid decoding an empty bitstream
-
+///* //Commented by Jubran to avoid decoding an empty bitstream
  if (!cdc)
   {    
     // luma or chroma AC    
     nnz = (!cac) ? predict_nnz(currMB, LUMA, i<<2, j<<2) : predict_nnz_chroma(currMB, i, ((j-4)<<2));
+
     currSE.value1 = (nnz < 2) ? 0 : ((nnz < 4) ? 1 : ((nnz < 8) ? 2 : 3));
-    readSyntaxElement_NumCoeffTrailingOnes(&currSE, currStream, type); 
-    numcoeff        =  currSE.value1; 
+
+    readSyntaxElement_NumCoeffTrailingOnes(&currSE, currStream, type);
+
+    numcoeff        =  currSE.value1;
     numtrailingones =  currSE.value2;
+
     p_Vid->nz_coeff[mb_nr][0][j][i] = (byte) numcoeff;
   }
   else
   {
     // chroma DC
     readSyntaxElement_NumCoeffTrailingOnesChromaDC(p_Vid, &currSE, currStream);
+
     numcoeff        =  currSE.value1;
     numtrailingones =  currSE.value2;
- }
-*/ //end of commenting by Jubran
-
+  }
+//*/ //end of commenting by Jubran
 
 ///* added by Jubran to tell the deoder that the coeff received even without being transmitted is 0;
-      numtrailingones =  0;
-      currSE.len=1;
+//      numtrailingones =  0;
+//      currSE.len=1;
 // */ //finish adding
-
-//printf("\n\n\nJubran .. Decoding Frame=%3d ... MB=%3d ... j=%d ... i=%d..numcoeff=%d",p_Vid->frame_no, currMB->mbAddrX,j,i,numcoeff);
-//printf("\nJubran .. Decoding numcoeff=%3d ... numtrailingones=%3d ... max_coeff_num=%3d",numcoeff, numtrailingones,max_coeff_num);
 
   memset(levarr, 0, max_coeff_num * sizeof(int));
   memset(runarr, 0, max_coeff_num * sizeof(int));
@@ -306,8 +306,7 @@ void read_coeff_4x4_CAVLC (Macroblock *currMB,
   numones = numtrailingones;
   *number_coefficients = numcoeff;
 
-
-/* commented by Jubran to avoid trying to decode an empty coeff bitstream
+//* commented by Jubran to avoid trying to decode an empty coeff bitstream
   if (numcoeff)
   {
     if (numtrailingones)
@@ -330,11 +329,9 @@ void read_coeff_4x4_CAVLC (Macroblock *currMB,
       }
     }
 
-
     // decode levels
     level_two_or_higher = (numcoeff > 3 && numtrailingones == 3)? 0 : 1;
     vlcnum = (numcoeff > 10 && numtrailingones < 3) ? 1 : 0;
-
 
     for (k = numcoeff - 1 - numtrailingones; k >= 0; k--)
     {
@@ -415,9 +412,9 @@ void read_coeff_4x4_CAVLC (Macroblock *currMB,
         i --;
       } while (zerosleft != 0 && i != 0);
     }
-    runarr[i] = zerosleft;   
+    runarr[i] = zerosleft;    
   } // if numcoeff
-*/ //end of comment by jubran to decode a no-coeff bitstream
+//*/ //end of comment by jubran to decode a no-coeff bitstream
 }
 
 /*!

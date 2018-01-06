@@ -1200,8 +1200,7 @@ void luma_residual_coding (Macroblock *currMB)
 
   if (is_skip)
   {
-   // printf("Jubran ... Skip Residual Coding of a Luma macroblock number %2d in frame %2d\n",currMB->mbAddrX,currMB->slice_nr);
-  //  for (block8x8=0; block8x8<4; ++block8x8)
+ 
     {    
       currSlice->set_modes_and_reframe (currMB, block8x8, &p_dir, list_mode, list_ref_idx);
     }
@@ -1218,7 +1217,6 @@ void luma_residual_coding (Macroblock *currMB)
   else 
   {
     int sum_cnt_nonz = 0;    
-//printf("Jubran ... no slip Residual Coding of a Luma macroblock number %2d in frame %2d\n",currMB->mbAddrX,currMB->slice_nr);
     if (currMB->mb_type == P16x16)
     {
       for (block8x8 = 0; block8x8 < 4; ++block8x8)
